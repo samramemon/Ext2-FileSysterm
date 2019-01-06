@@ -1,0 +1,2 @@
+myrcp: myrcp.c    #target: dependency list
+	gcc -g -o myrcp myrcp.c  # rule - line MUST begin with TAB

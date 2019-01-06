@@ -1,0 +1,1 @@
+gcc -g my_filetree_sim.c

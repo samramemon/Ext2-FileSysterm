@@ -1,0 +1,273 @@
+/************************************************************************
+Cpt_S 360: Systems Programming C/C++ - Lab3
+
+Nofal Aamir
+WSU ID 11547300
+
+************************************************************************/
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+
+/**********************STRUCTS*****************************************/
+typedef struct proc{
+           struct proc *next;  // for maintain PROCs in link lists and queues
+           int pid;            // process PID
+           int ppid;           // parent process PID
+           int status;         // FREE|READY|RUN|SLEEP|ZOMBIE, etc
+           int priority;       // scheduling priority
+           int event;          // for sleep/wakeup
+           int exitCode;       // exit code value
+           struct proc *child, *sibling, *parent; // for process binary tree
+  //OFT *fd[NFD];       // opened file descriptors
+           // MANY OTHER FIELDS
+         }PROC;
+
+/**********************GLOBALS*****************************************/
+PROC p1, p2;
+char passedin[128];                // for getting user input line
+char home[64];                     // for paths to executable and home path
+char command[64];                  // for command strings
+char *name_paths[15];              // token string pointers
+int  no_paths = 0;
+char *myargs[100];                 // arguments
+int  myargc;                       // number of arguments
+FILE *fp;
+
+/**********************FUNCTIONS*****************************************/
+int resetAll()
+{
+     memset(command, 0, 64);
+     memset(passedin, 0, 128);
+
+     for (int i = 0; i < myargc; i++)
+       {
+	 myargs[i] = 0;   // make all pointers NULL
+       }
+     
+     myargc = 0;
+}
+
+int getCommand(int index)
+{
+     char temp[64];
+
+     strcpy(temp, name_paths[index]);
+
+     if (strcmp(command, myargs[0]) != 0)
+         strcpy(command, myargs[0]);  // place first argument in as the command if not already present
+
+     strcat(temp, "/");               // concatenate PATH with '/'
+     strcat(temp, command);           // concatenate PATH with command
+     strcpy(command, temp);
+     printf("trying cmd: %s\n", command);
+}
+
+int getArguments(char *mystr)
+{
+     char *s;
+     char temp[100];
+     int i = 0;
+
+     strcpy(temp, mystr);
+  
+     s = strtok(temp, " ");
+     //strcpy(command, s);  // place first argument in as the command
+     while(s)
+       {
+	 myargs[i] = (char *)malloc(strlen(s));
+	 strcpy(myargs[i], s);
+	 s = strtok(0, " ");
+	 i++;
+       }
+     return i;
+}
+
+int getPaths(char *mystr)
+{
+     char *s;
+     char temp[200];
+     int i = 0;
+  
+     strcpy(temp, mystr);  //make copy of mystr entered
+  
+     s = strtok(temp, "=");
+     s = strtok(0, ":");
+  
+     while (s){
+       name_paths[i] = (char *)malloc(strlen(s));
+       strcpy(name_paths[i], s);   //store pointer to token in name[] array
+       s = strtok(0, ":");
+       i++;
+     }
+     return i;
+}
+
+void getHome(char *mystr)
+{
+     char *s;
+     char temp[50];
+  
+     strcpy(temp, mystr);  //make copy of mystr entered
+  
+     s = strtok(temp, "=");
+     s = strtok(0, "=");
+
+     strcpy(mystr, s);
+}
+
+void parseArgs()
+{
+     
+     // assuming myargs has more than just the command
+     for (int n = 1; myargs[n] < myargc; n++)
+       {
+	   if (strcmp(myargs[n], '<'))
+	     printf("has < infile\n");  // take inputs from infile
+	   else if (strcmp(myargs[n], '>'))
+	     printf("has > outfile\n");  // send outputs to outfile
+	   else if (strcmp(myargs[n], '>>'))
+	     printf("has >> outfile APPEND\n");  // APPEND outputs to outfile
+	   else if (strcmp(myargs[n], '|'))
+	     printf("has | pipe\n");  // pipe dat shiz
+       }
+}
+
+void sym(char *env[])
+{
+     int r = 0;
+  
+     if (strcmp(myargs[0], "cd") == 0 && myargs[1] == NULL)
+       {
+	 if (chdir(home) < 0)
+	   {
+	     printf("chdir unsuccessful\n");
+	     return ;
+	   }
+	 return ;
+       }
+     else if (strcmp(myargs[0], "cd") == 0)
+       {
+	 if (chdir(myargs[1]) < 0)
+	   {
+	     printf("chdir unsuccessful\n");
+	     return ;
+	   }
+	 return ;
+       }
+     else if (strcmp(myargs[0], "exit") == 0)
+       {
+	 exit(1);
+	 return ;
+       }
+  
+  
+     printf("\nTHIS IS %d  MY PARENT=%d\n", getpid(), getppid()); 
+     p1.pid = fork();   // fork syscall; parent returns child pid, child returns 0
+	   
+     if (p1.pid < 0) // fork() may fail. e.g. no more PROC in Kernel
+       {  
+	 perror("fork failed");
+	 exit(1);
+       }
+      
+     if (p1.pid == 0) // child
+       {
+	   for (int c = 0; c < no_paths; c++)
+	     {
+	          getCommand(c);
+		  r = execve(command, myargs, env);  // int execve(const char *filename, char *const argv[], char *const envp[]);
+		  //if (r < 0)
+		  //printf("errno=%d : %s\n", errno, strerror(errno));
+	     }
+	   if (r < 0)
+	        printf("errno=%d : %s\n", errno, strerror(errno));
+	   
+	   exit(1);
+       }
+     else  // parent 
+       {
+	 printf("PARENT %d WAITS FOR CHILD %d TO DIE\n", getpid(), p1.pid);
+	 p2.pid = wait(p2.status);
+	 printf("DEAD CHILD=%d, HOW=%04x\n", p2.pid, p2.status);
+       }
+}
+
+/**********************MAIN*****************************************/
+void main(int argc, char *argv[], char *env[])
+{
+      int index = 0;
+      char paths[200];
+
+      memset(paths, 0, 250*sizeof(char));
+      
+      printf("***********Welcome to nash yo...sup?!*************\n");
+      
+      // find PATH in environment
+      printf("1. show PATH:\n");
+      while(strncmp(env[index], "PATH", 4) != 0)
+	{
+	  index++;
+	}
+      strcpy(paths, env[index]);
+      printf("%s len:%li\n", paths, strlen(paths));
+
+
+      // find HOME in environment
+      index = 0;
+      printf("2. show HOME:\n");
+      while(strncmp(env[index], "HOME", 4) != 0)
+	{
+	  index++;
+	}
+      strcpy(home, env[index]);
+      getHome(home);
+      printf("%s\n", home);
+
+      
+      // decompose PATH
+      //printf("strlen_paths: %d", strlen(paths));
+      no_paths = getPaths(paths);
+      printf("3. decomposed paths:");
+      for (index = 0; index < no_paths; index++)
+	{
+	  printf("%s, ", name_paths[index]);
+	}
+      printf("\nnumber of paths: %i\n", no_paths);
+
+
+
+      
+      // main loop
+      printf("4.*********loopin nash*******\n");
+      while(1)
+	{
+	  resetAll();
+	  
+	  printf("nash % : ");
+	  fgets(passedin,128,stdin);
+	  passedin[strlen(passedin)-1] = 0;
+	  
+	  if (passedin[0] == '\0')
+	    continue;
+	  
+	  myargc = getArguments(passedin);
+	  printf("arguments:%i\n values: ", myargc);
+	  for(int n=0; n<myargc; n++)
+	    {
+	      printf("%s,", myargs[n]);
+	    }
+
+	  if (myargc == 1)
+	    {
+	      sym(env);
+	      continue;
+	    }
+	  // forking
+	  parseArgs();
+	  sym(env);
+	}
+}
+

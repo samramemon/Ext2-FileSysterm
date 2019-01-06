@@ -1,0 +1,2 @@
+mysh: mysh.c    #target: dependency list
+	gcc -g mysh.c  # rule - line MUST begin with TAB

@@ -1,0 +1,115 @@
+Current directory is /home/nofalaamir/cpts_360/lab6/
+GNU gdb (Ubuntu 8.1-0ubuntu3) 8.1.0.20180409-git
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from showblock...done.
+Breakpoint 1 at 0xccf: file showblock.c, line 100.
+(gdb) r mydisk /dir1
+Starting program: /home/nofalaamir/cpts_360/lab6/showblock mydisk /dir1
+
+Breakpoint 1, dirp () at showblock.c:101
+101	{
+(gdb) p n
+$1 = 1
+(gdb) p pathname
+$2 = 0x7fffffffe3a0 "/dir1"
+(gdb) p tkn
+$3 = {0x7fffffffda91 "dir1", 0x0 <repeats 63 times>}
+(gdb) p ip
+$4 = (INODE *) 0x5555557562e0 <buf+128>
+(gdb) p ip->imode
+There is no member named imode.
+(gdb) p ip->i_mode
+$5 = 16877
+(gdb) p dp
+$6 = (DIR *) 0x0
+(gdb) p dp
+$7 = (DIR *) 0x7fffffffd6d0
+(gdb) p name
+$8 = 0x7fffffffda91 ""
+(gdb) p tkn
+$9 = {0x7fffffffda91 "", 0x0 <repeats 63 times>}
+(gdb) q
+
+Debugger finished
+Current directory is /home/nofalaamir/cpts_360/lab6/
+GNU gdb (Ubuntu 8.1-0ubuntu3) 8.1.0.20180409-git
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from showblock...done.
+Breakpoint 1 at 0xccf: file showblock.c, line 100.
+(gdb) r mydisk dir1
+Starting program: /home/nofalaamir/cpts_360/lab6/showblock mydisk dir1
+
+Breakpoint 1, dirp () at showblock.c:101
+101	{
+(gdb) p tkn
+$1 = {0x7fffffffda90 "dir1", 0x0 <repeats 63 times>}
+(gdb) p tkn[0]
+$2 = 0x7fffffffda90 "dir1"
+(gdb) p name
+$3 = 0x7fffffffda90 "dir1"
+(gdb) p name
+$4 = 0x7fffffffda90 "dir1"
+(gdb) p name
+$5 = 0x7fffffffda90 ""
+(gdb) q
+
+Debugger finished
+Current directory is /home/nofalaamir/cpts_360/lab6/
+GNU gdb (Ubuntu 8.1-0ubuntu3) 8.1.0.20180409-git
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from showblock...done.
+Breakpoint 1 at 0xd0f: file showblock.c, line 100.
+(gdb) r mydisk dir1
+Starting program: /home/nofalaamir/cpts_360/lab6/showblock mydisk dir1
+
+Breakpoint 1, dirp () at showblock.c:101
+101	{
+(gdb) p tkn
+$1 = {0x7fffffffda90 "dir1", 0x0 <repeats 63 times>}
+(gdb) p tkn
+$2 = {0x7fffffffda90 "dir1", 0x0 <repeats 63 times>}
+(gdb) p tkn[0]
+$3 = 0x7fffffffda90 "dir1"
+(gdb) p tkn[0]
+$4 = 0x7fffffffda90 ""
+[Switching to thread 1 (process 12648)](running)
+
+Breakpoint 1, dirp () at showblock.c:101
+101	{
+(gdb) 
